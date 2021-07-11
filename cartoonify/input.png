@@ -1,0 +1,34 @@
+import discord
+from discord.ext import tasks
+
+with open('credentials.txt', 'r') as f:
+    BOT_TOKEN = f.readline()
+
+# @tasks.loop(seconds=5)
+# async def test():
+#     channel = client.guilds[0].text_channels[0]
+#     await channel.send("test")
+
+class CustomClient(discord.Client):
+    @tasks.loop(seconds=20)
+    async def test(self):
+        channel = client.guilds[0].text_channels[0]
+        self.cm = await channel.send("hi alex, im tired")
+        await self.cm.add_reaction("\N{TIRED FACE}")
+
+    async def on_ready(self):
+        self.test.start()
+
+    async def on_message(self, message):
+        print(message.content)
+
+    async def on_reaction_add(self, reaction, user):
+        # print(reaction.message.content)
+        if reaction.message == self.cm and user != self.user:
+            await self.cm.remove_reaction(reaction, user)
+
+    async def on_reaction_remove():
+        pass
+
+client = CustomClient()
+client.run(BOT_TOKEN)
